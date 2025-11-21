@@ -1,8 +1,10 @@
 package com.udacity.jdnd.course3.critter.schedule;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.List;
+import java.util.*;
+import com.udacity.jdnd.course3.critter.util.DTOMapper;
 
 /**
  * Handles web requests related to Schedules.
@@ -11,28 +13,62 @@ import java.util.List;
 @RequestMapping("/schedule")
 public class ScheduleController {
 
+    @Autowired
+    private ScheduleEntityService scheduleEntityService;
+
+    @Autowired
+    private DTOMapper mapper;
+
     @PostMapping
     public ScheduleDTO createSchedule(@RequestBody ScheduleDTO scheduleDTO) {
-        throw new UnsupportedOperationException();
+        Schedule saved = scheduleEntityService.createSchedule(
+                scheduleDTO.getPetIds(),
+                scheduleDTO.getEmployeeIds(),
+                scheduleDTO.getDate(),
+                scheduleDTO.getActivities()
+        );
+        return mapper.toScheduleDTO(saved);
     }
 
     @GetMapping
     public List<ScheduleDTO> getAllSchedules() {
-        throw new UnsupportedOperationException();
+        List<Schedule> all = scheduleEntityService.findAll();
+        List<ScheduleDTO> res = new ArrayList<>();
+        for (Schedule s : all) res.add(mapper.toScheduleDTO(s));
+        return res;
     }
 
     @GetMapping("/pet/{petId}")
     public List<ScheduleDTO> getScheduleForPet(@PathVariable long petId) {
-        throw new UnsupportedOperationException();
+        List<Schedule> list = scheduleEntityService.findByPetId(petId);
+        List<ScheduleDTO> res = new ArrayList<>();
+        for (Schedule s : list) res.add(mapper.toScheduleDTO(s));
+        return res;
     }
 
     @GetMapping("/employee/{employeeId}")
     public List<ScheduleDTO> getScheduleForEmployee(@PathVariable long employeeId) {
-        throw new UnsupportedOperationException();
+        List<Schedule> list = scheduleEntityService.findByEmployeeId(employeeId);
+        List<ScheduleDTO> res = new ArrayList<>();
+        for (Schedule s : list) res.add(mapper.toScheduleDTO(s));
+        return res;
     }
 
     @GetMapping("/customer/{customerId}")
     public List<ScheduleDTO> getScheduleForCustomer(@PathVariable long customerId) {
-        throw new UnsupportedOperationException();
+        List<Schedule> list = new ArrayList<>();
+        
+        List<Schedule> all = scheduleEntityService.findAll();
+        for (Schedule s : all){
+            for (com.udacity.jdnd.course3.critter.pet.Pet p : s.getPets()){
+                if (p.getOwner() != null && customerId == p.getOwner().getId()){
+                    list.add(s);
+                    break;
+                }
+            }
+        }
+        List<ScheduleDTO> res = new ArrayList<>();
+        for (Schedule s : list) res.add(mapper.toScheduleDTO(s));
+        return res;
     }
 }
