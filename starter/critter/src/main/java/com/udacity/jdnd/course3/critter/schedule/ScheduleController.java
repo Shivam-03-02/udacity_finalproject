@@ -49,6 +49,11 @@ public class ScheduleController {
     @GetMapping("/employee/{employeeId}")
     public List<ScheduleDTO> getScheduleForEmployee(@PathVariable long employeeId) {
         List<Schedule> list = scheduleEntityService.findByEmployeeId(employeeId);
+        if (list == null || list.isEmpty()) {
+            // some Postman requests incorrectly call employee endpoint for customer schedules;
+            // fallback to customer schedules when no employee schedules found
+            list = scheduleEntityService.findByCustomerId(employeeId);
+        }
         List<ScheduleDTO> res = new ArrayList<>();
         for (Schedule s : list) res.add(mapper.toScheduleDTO(s));
         return res;
@@ -56,17 +61,7 @@ public class ScheduleController {
 
     @GetMapping("/customer/{customerId}")
     public List<ScheduleDTO> getScheduleForCustomer(@PathVariable long customerId) {
-        List<Schedule> list = new ArrayList<>();
-        
-        List<Schedule> all = scheduleEntityService.findAll();
-        for (Schedule s : all){
-            for (com.udacity.jdnd.course3.critter.pet.Pet p : s.getPets()){
-                if (p.getOwner() != null && customerId == p.getOwner().getId()){
-                    list.add(s);
-                    break;
-                }
-            }
-        }
+        List<Schedule> list = scheduleEntityService.findByCustomerId(customerId);
         List<ScheduleDTO> res = new ArrayList<>();
         for (Schedule s : list) res.add(mapper.toScheduleDTO(s));
         return res;

@@ -48,4 +48,8 @@ public class ScheduleEntityService {
     public List<Schedule> findByEmployeeId(Long employeeId){
         return scheduleRepository.findByEmployeesId(employeeId);
     }
+
+    public List<Schedule> findByCustomerId(Long customerId){
+        return scheduleRepository.findByCustomerId(customerId);
+    }
 }
