@@ -1,9 +1,18 @@
 package com.udacity.jdnd.course3.critter.schedule;
 
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 import java.util.List;
 
 public interface ScheduleRepository extends JpaRepository<Schedule, Long> {
-    List<Schedule> findByPetsId(Long petId);
-    List<Schedule> findByEmployeesId(Long employeeId);
+
+    @Query("select distinct s from Schedule s left join fetch s.pets p left join fetch s.employees e where p.id = :petId")
+    List<Schedule> findByPetsId(@Param("petId") Long petId);
+
+    @Query("select distinct s from Schedule s left join fetch s.pets p left join fetch s.employees e where e.id = :employeeId")
+    List<Schedule> findByEmployeesId(@Param("employeeId") Long employeeId);
+
+    @Query("select distinct s from Schedule s left join fetch s.pets p left join fetch s.employees e")
+    List<Schedule> findAllWithPetsAndEmployees();
 }

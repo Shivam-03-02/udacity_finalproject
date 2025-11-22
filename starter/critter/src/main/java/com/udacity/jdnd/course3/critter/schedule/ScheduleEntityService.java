@@ -6,11 +6,13 @@ import com.udacity.jdnd.course3.critter.user.Employee;
 import com.udacity.jdnd.course3.critter.user.EmployeeRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
 import java.util.*;
 
 @Service
+@Transactional
 public class ScheduleEntityService {
 
     @Autowired
@@ -36,7 +38,7 @@ public class ScheduleEntityService {
     }
 
     public List<Schedule> findAll(){
-        return scheduleRepository.findAll();
+        return scheduleRepository.findAllWithPetsAndEmployees();
     }
 
     public List<Schedule> findByPetId(Long petId){
